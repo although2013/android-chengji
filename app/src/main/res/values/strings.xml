@@ -8,6 +8,9 @@
     <string name="prompt_xuehao">学号</string>
     <string name="bxqcj">查询本学期成绩</string>
     <string name="title_activity_display_message">本学期成绩</string>
-    
+    <string name="this_term_marks_address">http://192.168.11.239/bxqcjcxAction.do</string>
+    <string name="the_login_address">http://192.168.11.239/loginAction.do</string>
+    <string name="get_real_name">http://192.168.11.239/menu/s_top.jsp</string>
+
 
 </resources>

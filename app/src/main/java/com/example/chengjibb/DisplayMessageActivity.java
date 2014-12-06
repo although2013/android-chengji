@@ -31,6 +31,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -138,7 +139,7 @@ public class DisplayMessageActivity extends Activity {
 	            outputStream.close();
 	            
 	            cookie = httpURLConnection.getHeaderField("Set-Cookie");
-	            //InputStream in = httpURLConnection.getInputStream(); 
+	            //InputStream in = httpURLConnection.getInputStream();
 		        
 		        httpURLConnection.disconnect();
 		                       
@@ -185,10 +186,18 @@ public class DisplayMessageActivity extends Activity {
 		mProgress.setProgress(55);
 
 		int count = 1;
+        Log.w("cccc", str);
 		String[] buf = str.split(",");
 		StringBuffer sb = new StringBuffer();
 		mProgress.setProgress(57);
+        if (buf.length % 7 != 0 ){
+            str = str.concat("N");
+            buf = str.split(",");
+            Log.w("cccc++++++", str);
+        }
+        Log.w("cccc", String.valueOf(buf.length));
 		for(int i=0;i<buf.length;i++){
+            Log.w("ccc-single","No."+Integer.toString(i)+" buf: "+buf[i]);
 			mProgress.setProgress(60+i/5);
 			if (count == 8){count = 1;}
 			if (count == 3){
@@ -196,7 +205,11 @@ public class DisplayMessageActivity extends Activity {
 				sb.append(" ");
 			}
 			if (count == 7){
-				sb.append(buf[i]);
+                if (buf[i].length() < 1) {
+                    sb.append("N");
+                }else {
+                    sb.append(buf[i]);
+                }
 				sb.append(" ");
 			}
 			count++;
@@ -208,7 +221,7 @@ public class DisplayMessageActivity extends Activity {
 	public String getRealName(String cookie){
 		String str = null;
 		try {
-			InputStream page_realname = GetPage("http://60.219.165.24/menu/s_top.jsp", cookie);
+			InputStream page_realname = GetPage(getString(R.string.get_real_name), cookie);
 			str = InputStreamTOString(page_realname);
 		} catch(Exception e){
 
@@ -232,9 +245,9 @@ public class DisplayMessageActivity extends Activity {
 			String marks_value = null;
 			String realName = null;
 			try {
-				cookie = post_get_cookie("http://60.219.165.24/loginAction.do",parms[0],parms[1]);
+				cookie = post_get_cookie(getString(R.string.the_login_address),parms[0],parms[1]);
 					mProgress.setProgress(15);
-				InputStream page_marks = GetPage("http://60.219.165.24/bxqcjcxAction.do", cookie);
+				InputStream page_marks = GetPage(getString(R.string.this_term_marks_address), cookie);
 					mProgress.setProgress(25);
 				marks_str = InputStreamTOString(page_marks);
                     mProgress.setProgress(32);
@@ -269,8 +282,9 @@ public class DisplayMessageActivity extends Activity {
 			/*>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 			} else {
 				String[] arr = result.split(",");
-
+                Log.w("cccc", result);
 				String realName = arr[1];
+                Log.w("cccc",realName);
 				ProgressBar mProgress = (ProgressBar)findViewById(R.id.myProgressBar);
 				mProgress.setVisibility(View.GONE);
 				ListView list = (ListView) findViewById(R.id.listView);
@@ -278,21 +292,25 @@ public class DisplayMessageActivity extends Activity {
 
 				textView_name.setText(realName);
 				textView_name.setBackgroundColor(0x231111);
-				ArrayList<HashMap<String, String>> mylist = new ArrayList<HashMap<String, String>>();  
-				String[] sa = arr[0].split(" ");
+                ArrayList<HashMap<String, String>> mylist = new ArrayList<HashMap<String, String>>();
+                String[] sa = arr[0].split(" ");
 
-				for(int i = 0; i < sa.length; i = i + 2)
-				{  
-					HashMap<String, String> map = new HashMap<String, String>();
-	    
-					map.put("ItemTitle",sa[i]);
-					map.put("ItemText",sa[i+1]);
-	    
-					mylist.add(map);
-				}
+                int sa_length = sa.length;
+                for(int i = 0; i < sa_length; i = i + 2)
+                {
+                    HashMap<String, String> map = new HashMap<String, String>();
 
+                    map.put("ItemTitle",sa[i]);
+                    map.put("ItemText",sa[i+1]);
+
+                    mylist.add(map);
+                }
+
+
+                Log.w("cccc","ishere? 222");
 				SimpleAdapter mSchedule = new SimpleAdapter(DisplayMessageActivity.this, mylist, R.layout.listitem, new String[] {"ItemTitle", "ItemText"}, new int[] {R.id.ItemTitle,R.id.ItemText});  
 				list.setAdapter(mSchedule);
+                Log.w("cccc","ishere? 333");
 			}
 		}
 
